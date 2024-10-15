@@ -3,12 +3,23 @@
 
 int main(void){
   int rows,cols;
-  rows = 100;
-  cols = 4;
+  rows = 10;
+  cols = 3;
+  Dataset *data = make_regression(rows, cols);
+  Parameter *params = parameter(data);
 
-  Dataset *data = create_data(rows, cols);
-  print_dataset(data);
+
+  print_single(params->weight, data->cols);
+  double pred[data->rows];
+  ddot(params->weight,data->x,data->rows,data->cols,pred,0.0);
+  print_single(pred, rows);
+
+
   free_dataset(data);
+  free_params(params);
+
+
+  return 0;
 
 }
 
