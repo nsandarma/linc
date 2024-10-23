@@ -3,7 +3,6 @@
 // len coef/weight = len(features)
 // len intercept/bias = 1 if class == binary_class else len(class)
 
-
 double sum(double *x, int n){
   double t=0.0;
   for(int i = 0; i < n;i++){
@@ -86,38 +85,88 @@ int linalg_inv(double *matrix, double *inverse, int size) {
   return 1; // Matriks berhasil dihitung inversnya
 }
 
-Parameter *parameter(Dataset *data){
+Parameter *parameter(Dataset *data,double intercept){
   Parameter *params = (Parameter *)malloc(sizeof(Parameter)) ;
-  double intercept = 0.0;
+  int cols;
   double *theta = (double *)malloc(data->cols * sizeof(double));
-  double x_transpose[data->rows * data->cols];
-  double xt_dot_x[data->cols * data->cols];
-  double linalg[data->cols * data->cols];
-  double linalg_xt[data->cols * data->rows];
-
   for (int i = 0 ; i < data->cols; i++){
     theta[i] = 0;
   }
 
-  // transpose X
-  transpose(data->x, x_transpose, data->rows, data->cols);
+  if (intercept != 0.0){
+    cols = data->cols +1;
 
-  // Xt dot X
-  dot(x_transpose,data->x,xt_dot_x,data->cols,data->rows,data->rows,data->cols);
+    double x_intercept[data->rows * cols];
+    double x_transpose[data->rows * cols];
+    double xt_dot_x[cols * cols];
+    double linalg[cols * cols];
+    double linalg_xt[cols * data->rows];
+    double theta_temp[cols];
 
-  // linalg_inv
-  linalg_inv(xt_dot_x,linalg, data->cols);
+    for(int i = 0; i < data->rows; i++){
+      for(int j = 0 ; j < cols;j++){
+        double tmp;
+        if (j != data->cols){
+          tmp = data->x[i * data->cols + j];
+        }else{
+          tmp = intercept;
+        }
+        x_intercept[i * cols + j] = tmp;
 
-  // linalg dot xt
-  dot(linalg,x_transpose,linalg_xt,data->cols,data->cols,data->cols,data->rows);
+      }
+    }
 
-  // theta
-  ddot(data->y,linalg_xt,data->cols,data->rows,theta,0.0000);
+    // transpose X
+    transpose(x_intercept, x_transpose, data->rows, cols);
+
+    // Xt dot X
+    dot(x_transpose,x_intercept,xt_dot_x,cols,data->rows,data->rows,cols);
+
+    // linalg_inv
+    linalg_inv(xt_dot_x,linalg, cols);
+
+    // linalg dot xt
+    dot(linalg,x_transpose,linalg_xt,cols,cols,cols,data->rows);
+
+    // theta
+    ddot(data->y,linalg_xt,cols,data->rows,theta_temp,0.0);
+
+    for (int i = 0 ; i < data->cols; i ++){
+      theta[i] = theta_temp[i];
+    }
+
+    params->weight = theta ;
+    params->intercept = theta_temp[cols];
+    return params;
 
 
-  params->weight = theta ;
-  params->intercept = intercept;
-  return params;
+  }else{
+
+    double x_transpose[data->rows * data->cols];
+    double xt_dot_x[data->cols * data->cols];
+    double linalg[data->cols * data->cols];
+    double linalg_xt[data->cols * data->rows];
+
+    // transpose X
+    transpose(data->x, x_transpose, data->rows, data->cols);
+
+    // Xt dot X
+    dot(x_transpose,data->x,xt_dot_x,data->cols,data->rows,data->rows,data->cols);
+
+    // linalg_inv
+    linalg_inv(xt_dot_x,linalg, data->cols);
+
+    // linalg dot xt
+    dot(linalg,x_transpose,linalg_xt,data->cols,data->cols,data->cols,data->rows);
+
+    // theta
+    ddot(data->y,linalg_xt,data->cols,data->rows,theta,0.0);
+
+    params->weight = theta ;
+    params->intercept = intercept;
+    return params;
+  }
+
+
 }
-
 

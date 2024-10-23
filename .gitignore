@@ -1,3 +1,4 @@
 temp/
 **.o
+mv_temp.sh
 

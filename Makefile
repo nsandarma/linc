@@ -30,6 +30,7 @@ $(TARGET): $(OBJ)
 # Membersihkan file objek dan executable
 clean:
 	rm -f $(OBJ) $(TARGET)
+	rm -f *.csv
 
 # Phony target untuk memastikan clean dan all tidak bentrok dengan file bernama sama
 .PHONY: clean all

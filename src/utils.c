@@ -1,4 +1,5 @@
 #include "linear.h"
+#include <stdio.h>
 
 void print_dataset(Dataset *data,int n){
   if (n == 0){
@@ -21,15 +22,30 @@ void print_single(double *arr,int n){
 }
 
 void print_matrix(double *matrix, int rows, int cols) {
-    // Menampilkan matriks
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            printf("%.4f ", matrix[i * cols + j]);
-        }
-        printf("\n");
+  // Menampilkan matriks
+  for (int i = 0; i < rows; i++) {
+    for (int j = 0; j < cols; j++) {
+      printf("%.4f ", matrix[i * cols + j]);
     }
+    printf("\n");
+  }
 }
 
+void concatenate(double *A, double *B, double *C, int rows, int cols) {
+  for(int i = 0 ; i < rows; i++){
+    for(int j = 0 ; j < cols+1; j++){
+      double temp;
+      if(j != cols){
+        temp = A[i * cols + j];
+      }
+      else{
+        temp = B[i];
+      }
+      C[i * (cols+1) + j] = temp;
+    }
+
+  }
+}
 
 void transpose(double arr[],double arrT[],int rows, int cols){
   for(int i = 0; i < rows; i++){
@@ -78,6 +94,36 @@ Dataset *make_regression(int rows,int cols){
   return data;
 }
 
+void write_matrix(const char *filename, int rows, int cols, double *matrix){
+  FILE *fp = fopen(filename,"w");
+  assert(fp != NULL && "Tidak dapat membuka file");
+  if (cols != 0){
+    for(int i = 0; i < rows; i++){
+      for(int j = 0; j < cols; j++){
+        // Mengakses elemen matriks menggunakan formula indeks 1D
+        fprintf(fp, "%f", matrix[i * cols + j]);
+
+        // Jika bukan elemen terakhir di baris, tambahkan koma
+        if (j < cols - 1) {
+            fprintf(fp, ",");
+        }
+      }
+      fprintf(fp,"\n");
+    }
+  }else{
+    for(int i = 0 ; i < rows; i++){
+      fprintf(fp,"%f",matrix[i]);
+      if (i < rows - 1 ){
+        fprintf(fp,",");
+      }
+    }
+  }
+  
+  fclose(fp);
+  printf("matrix telah berhasil ditulis ! %s.\n",filename);
+
+
+}
 
 void free_dataset(Dataset *data){
   if (data != NULL){

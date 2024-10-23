@@ -36,6 +36,8 @@ void print_single(double *arr,int n);
 void print_matrix(double *matrix, int rows, int cols);
 void fillArr(double arr[],int rows, int cols);
 void transpose(double arr[],double arrT[],int rows,int cols);
+void write_matrix(const char *filename,int rows, int cols,double *matrix);
+void concatenate(double *A, double *B, double *C, int rows, int cols);
 
 
 // ddot.c
@@ -46,7 +48,7 @@ void dot(double a[],double b[],double c[],int rowsA,int rowsB, int colsA, int co
 double get_mape(double y_true[],double y_pred[],int row);
 int linalg_inv(double *matrix, double *inverse, int size);
 void swap_rows(double *matrix, double *identity, int row1, int row2, int size);
-Parameter *parameter(Dataset *data);
+Parameter *parameter(Dataset *data,double intercept);
 
 #endif 
 
